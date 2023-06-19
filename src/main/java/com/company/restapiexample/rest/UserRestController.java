@@ -2,20 +2,16 @@ package com.company.restapiexample.rest;
 
 import com.company.restapiexample.dto.UserDto;
 import com.company.restapiexample.service.inter.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class UserRestController {
     private final UserService userService;
-
-    @Autowired
-    public UserRestController(UserService userService) {
-        this.userService = userService;
-    }
-
 
     @GetMapping("/users")
     public List<UserDto> getUsers() {

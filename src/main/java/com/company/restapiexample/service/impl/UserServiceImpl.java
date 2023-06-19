@@ -6,46 +6,29 @@ import com.company.restapiexample.exception.UserNotFoundException;
 import com.company.restapiexample.mapper.UserMapper;
 import com.company.restapiexample.repo.UserRepository;
 import com.company.restapiexample.service.inter.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @Autowired
-    private UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
-
 
     @Override
     public List<UserDto> findAll() {
-        List<User> users = userRepository.findAll();
-        return userMapper.toDto(users);
+        return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
 
     @Override
     public UserDto findUserById(Integer userId) {
-        User user = getUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
         return userMapper.toDto(user);
-    }
-
-    @Override
-    public User getUserById(Integer id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return (user.get());
-        }
-        throw new UserNotFoundException("user not found by id" + id);
-
     }
 
     @Override
@@ -60,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Integer userId) {
-        User user = getUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
         userRepository.delete(user);
     }
 }
